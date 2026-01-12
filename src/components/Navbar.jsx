@@ -28,7 +28,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Nav */}
-          <ul className="hidden md:flex ml-14 space-x-12">
+          <ul className="hidden md:flex absolute left-1/2 -translate-x-1/2 space-x-12">
             {navItems.map((item, index) => (
               <li key={index}>
                 <a href={item.href}>{item.label}</a>
