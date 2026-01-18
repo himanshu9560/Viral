@@ -10,114 +10,91 @@ import {
 } from "@clerk/clerk-react";
 
 const Navbar = () => {
-  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  // Handle scroll animation (DISABLED when menu is open)
+  // Lock background scroll when menu open
   useEffect(() => {
-    if (mobileDrawerOpen) return;
-
-    const onScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [mobileDrawerOpen]);
-
-  // Lock background scroll when menu is open
-  useEffect(() => {
-    document.body.style.overflow = mobileDrawerOpen ? "hidden" : "auto";
-  }, [mobileDrawerOpen]);
+    document.body.style.overflow = mobileOpen ? "hidden" : "auto";
+  }, [mobileOpen]);
 
   return (
-    <nav
-      className={`
-        sticky top-0 z-50
-        border-b border-neutral-700/80
-        transition-all duration-300 ease-out
-        ${
-          scrolled && !mobileDrawerOpen
-            ? "py-1 bg-neutral-900/80 backdrop-blur-xl shadow-lg"
-            : "py-3 bg-neutral-900/50 backdrop-blur-md"
-        }
-      `}
-    >
-      <div className="container px-4 mx-auto relative lg:text-sm">
-        <div className="flex justify-between items-center">
+    <>
+      {/* NAVBAR */}
+      <nav className="fixed top-0 left-0 w-full z-50 backdrop-blur-lg bg-neutral-900/70 border-b border-neutral-700/60">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
 
-          {/* Logo */}
-          <div className="flex items-center flex-shrink-0">
-            <img
-              src={logo}
-              alt="Logo"
-              className={`mr-2 transition-all duration-300 ${
-                scrolled ? "h-8 w-8" : "h-10 w-10"
-              }`}
-            />
-            <span className="text-xl tracking-tight">Viral-VR</span>
-          </div>
+            {/* Logo */}
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="logo" className="h-9 w-9" />
+              <span className="text-lg font-semibold">Viral-VR</span>
+            </div>
 
-          {/* Desktop Nav */}
-          <ul className="hidden md:flex absolute left-1/2 -translate-x-1/2 space-x-12">
-            {navItems.map((item, index) => (
-              <li key={index} className="relative group">
-                <a
-                  href={item.href}
-                  className="hover:text-orange-400 transition"
-                >
-                  {item.label}
-                </a>
-                <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-orange-500 transition-all group-hover:w-full"></span>
-              </li>
-            ))}
-          </ul>
+            {/* Desktop Nav */}
+            <ul className="hidden md:flex gap-10">
+              {navItems.map((item, index) => (
+                <li key={index} className="relative group">
+                  <a
+                    href={item.href}
+                    className="text-sm font-medium text-neutral-200 hover:text-orange-400 transition"
+                  >
+                    {item.label}
+                  </a>
+                  <span className="absolute left-0 -bottom-1 h-[2px] w-0 bg-orange-500 transition-all group-hover:w-full" />
+                </li>
+              ))}
+            </ul>
 
-          {/* Desktop Auth */}
-          <div className="hidden md:flex space-x-8 items-center">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <button className="px-4 py-1.5 rounded-md bg-gradient-to-r from-orange-500 to-orange-700 text-white text-sm">
-                  Sign In
-                </button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </div>
+            {/* Desktop Auth */}
+            <div className="hidden md:flex items-center gap-6">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="px-4 py-2 rounded-md bg-orange-500 hover:bg-orange-600 text-white text-sm">
+                    Sign In
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
+            </div>
 
-          {/* Mobile Toggle */}
-          <div className="md:hidden">
+            {/* Mobile Toggle */}
             <button
-              onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-              className="z-50 relative"
+              className="md:hidden"
+              onClick={() => setMobileOpen(!mobileOpen)}
             >
-              {mobileDrawerOpen ? <X /> : <Menu />}
+              {mobileOpen ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* MOBILE MENU (transform-only animation) */}
+      {/* MOBILE MENU OVERLAY */}
       <div
         className={`
-          fixed inset-0 z-40 bg-neutral-900
-          flex flex-col justify-center items-center md:hidden
+          fixed inset-0 z-40 bg-neutral-950
+          flex flex-col items-center justify-center
           transition-transform duration-300 ease-out
-          ${
-            mobileDrawerOpen
-              ? "translate-x-0"
-              : "translate-x-full"
-          }
+          ${mobileOpen ? "translate-y-0" : "-translate-y-full"}
         `}
       >
-        <ul className="text-2xl">
+        {/* Close button top right */}
+        <button
+          className="absolute top-5 right-5"
+          onClick={() => setMobileOpen(false)}
+        >
+          <X size={28} />
+        </button>
+
+        {/* Menu Items */}
+        <ul className="flex flex-col items-center gap-8 text-2xl font-semibold">
           {navItems.map((item, index) => (
-            <li key={index} className="py-4">
+            <li key={index}>
               <a
                 href={item.href}
-                onClick={() => setMobileDrawerOpen(false)}
+                onClick={() => setMobileOpen(false)}
+                className="hover:text-orange-400 transition"
               >
                 {item.label}
               </a>
@@ -125,10 +102,11 @@ const Navbar = () => {
           ))}
         </ul>
 
-        <div className="flex space-x-6 mt-8">
+        {/* Auth */}
+        <div className="mt-12">
           <SignedOut>
             <SignInButton mode="modal">
-              <button className="px-6 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-orange-700 text-white">
+              <button className="px-8 py-3 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold">
                 Sign In
               </button>
             </SignInButton>
@@ -138,7 +116,10 @@ const Navbar = () => {
           </SignedIn>
         </div>
       </div>
-    </nav>
+
+      {/* Spacer so content doesn't hide behind navbar */}
+      <div className="h-16" />
+    </>
   );
 };
 
